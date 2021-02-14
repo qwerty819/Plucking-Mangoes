@@ -1,16 +1,16 @@
+//anish test
 
 const Engine = Matter.Engine;
 const World = Matter.World;
 const Bodies = Matter.Bodies;
-const Body = Matter.Body;
 const Render = Matter.Render;
 const Constraint=Matter.Constraint;
-var treeObj, stoneObj,groundObject, launcherObject;
-var mango1;
-var world,boy;
+var treeObj, stone,groundObject, launcherObject;
+var mango1,mango2,mango3,mango4,mango5;
+var world,boy,boyImg;
 
 function preload(){
-	boy=loadImage("images/boy.png");
+	boyImg=loadImage("boy.png");
   }
 
 function setup() {
@@ -18,24 +18,66 @@ function setup() {
 	engine = Engine.create();
 	world = engine.world;
 
-	mango1=new mango(1100,100,30);
-
-	treeObj=new tree(1050,580);
-	groundObject=new ground(width/2,600,width,20);
-	
+	boy = createSprite(200,550);
+	boy.addImage(boyImg);
+	boy.scale = 0.1;
+	treeObj = new Tree(900,350,30,300);
+	ground = new Ground(600,600,2000,20);
+	mango1 = new Mango(900,250,15);
+	mango2 = new Mango(800,200,15);
+	mango3 = new Mango(800,280,15);
+	mango4 = new Mango(1000,250,15);
+	mango5 = new Mango(670,300,15);
+  stone = new Stone(150,550,15);
+  launcherObject = new Launcher(stone.body,{x:150,y:500});
 	Engine.run(engine);
-
 }
 
 function draw() {
-
-  background(230);
-  //Add code for displaying text here!
-  image(boy ,200,340,200,300);
+  rectMode(CENTER);
   
+  Engine.update(engine);
 
+  background("lightgray");
   treeObj.display();
-  mango1.display();
-
   groundObject.display();
+  mango1.display();
+  mango2.display();
+  mango3.display();
+  mango4.display();
+  mango5.display();
+  stone.display();
+  launcherObject.display();
+  detectCollision(stone,mango1);
+  detectCollision(stone,mango2);
+  detectCollision(stone,mango3);
+  detectCollision(stone,mango4);
+  detectCollision(stone,mango5);
+  drawSprites();
+ 
+}
+
+
+function mouseDragged(){
+    Matter.Body.setPosition(stone.body,{x:mouseX,y:mouseY});
+}
+
+function mouseReleased(){
+    launcherObject.fly();
+}
+function detectCollision(lstone,lmango){
+	mangoBodyPosition=lmango.body.position
+	stoneBodyPosition=lstone.body.position
+	var distance=dist(stoneBodyPosition.x,stoneBodyPosition.y,mangoBodyPosition.x,mangoBodyPosition.y)
+	if(distance<=lmango.r+lstone.r){
+		Matter.Body.setStatic(lmango.body,false);
+	}
+}
+
+function keyPressed(){
+
+	if(keyCode === 32){
+		Matter.Body.setPosition(stone.body,{x:150,y:550})
+		launcherObject.attach(stone.body);
+	}
 }
